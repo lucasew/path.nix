@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -eu -o pipefail
+
+function bold {
+    echo -e "$(tput bold)$@$(tput sgr0)"
+}
+function red {
+    echo -e "\033[0;31m$@\033[0m"
+}
+
+function usage {
+    echo "$(bold "$0"): load a NIX_PATH environment from a flake folder"
+}
+
+if [ $# -eq 0 ]; then
+    echo -e "$(red error): you must specify a flake folder"
+    usage
+else
+    FLAKE_DIR="$1"
+    export NIX_PATH=$(nix-instantiate --eval "$IMPORTER" --arg flake_path $FLAKE_DIR | sed 's;";;g')
+    echo "NIX_PATH=$NIX_PATH"
+fi
